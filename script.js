@@ -79,7 +79,7 @@ class View {
     this.input.value = ''
   }
 
-  createElement = (tag, className) => {
+  createElement(tag, className) {
     const element = document.createElement(tag)
 
     if (className) element.classList.add(className)
@@ -87,7 +87,7 @@ class View {
     return element
   }
 
-  getElement = selector => {
+  getElement(selector) {
     const element = document.querySelector(selector)
 
     return element
@@ -138,12 +138,12 @@ class View {
     console.log(todos)
   }
 
-  setUpEventListeners(listeners) {
-    this.form.addEventListener('submit', listeners.handleAddTodo)
-    this.todoList.addEventListener('click', listeners.handleDeleteTodo)
-    this.todoList.addEventListener('input', listeners.handleEditTodo)
-    this.todoList.addEventListener('focusout', listeners.handleEditTodoComplete)
-    this.todoList.addEventListener('change', listeners.handleToggle)
+  setUpEventListeners(controller) {
+    this.form.addEventListener('submit', controller.handleAddTodo)
+    this.todoList.addEventListener('click', controller.handleDeleteTodo)
+    this.todoList.addEventListener('input', controller.handleEditTodo)
+    this.todoList.addEventListener('focusout', controller.handleEditTodoComplete)
+    this.todoList.addEventListener('change', controller.handleToggle)
   }
 }
 
