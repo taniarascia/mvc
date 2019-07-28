@@ -35,9 +35,10 @@ class Model {
     this.onTodoListChanged(this.todos)
   }
 
-  toggle(id) {
-    const currentTodo = this.todos.filter(todo => todo.id === id)[0]
-    currentTodo.complete = !currentTodo.complete
+  toggleTodo(id) {
+    this.todos = this.todos.map(todo =>
+      todo.id === id ? { id: todo.id, text: todo.text, complete: !todo.complete } : todo
+    )
     this.update()
 
     this.onTodoListChanged(this.todos)
@@ -211,7 +212,7 @@ class Controller {
     if (event.target.type === 'checkbox') {
       const id = parseInt(event.target.parentElement.id)
 
-      this.model.toggle(id)
+      this.model.toggleTodo(id)
     }
   }
 }
