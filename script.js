@@ -8,8 +8,8 @@ class Model {
     this.todos = JSON.parse(localStorage.getItem('todos')) || []
   }
 
-  bindHandler(callbacks) {
-    this.onTodoListChanged = callbacks.onTodoListChanged
+  bindHandler(controller) {
+    this.onTodoListChanged = controller.onTodoListChanged
   }
 
   addTodo(todo) {
@@ -79,7 +79,7 @@ class View {
     this.input.value = ''
   }
 
-  createElement = (tag, className) => {
+  createElement(tag, className) {
     const element = document.createElement(tag)
 
     if (className) element.classList.add(className)
@@ -87,7 +87,7 @@ class View {
     return element
   }
 
-  getElement = selector => {
+  getElement(selector) {
     const element = document.querySelector(selector)
 
     return element
@@ -138,12 +138,12 @@ class View {
     console.log(todos)
   }
 
-  setUpEventListeners(listeners) {
-    this.form.addEventListener('submit', listeners.handleAddTodo)
-    this.todoList.addEventListener('click', listeners.handleDeleteTodo)
-    this.todoList.addEventListener('input', listeners.handleEditTodo)
-    this.todoList.addEventListener('focusout', listeners.handleEditTodoComplete)
-    this.todoList.addEventListener('change', listeners.handleToggle)
+  setUpEventListeners(controller) {
+    this.form.addEventListener('submit', controller.handleAddTodo)
+    this.todoList.addEventListener('click', controller.handleDeleteTodo)
+    this.todoList.addEventListener('input', controller.handleEditTodo)
+    this.todoList.addEventListener('focusout', controller.handleEditTodoComplete)
+    this.todoList.addEventListener('change', controller.handleToggle)
   }
 }
 
@@ -160,7 +160,7 @@ class Controller {
     this.model.bindHandler(this)
     this.view.setUpEventListeners(this)
 
-    this.temporaryState
+    this.temporaryEditValue
 
     // Display initial todos
     this.onTodoListChanged(this.model.todos)
@@ -187,16 +187,16 @@ class Controller {
 
   handleEditTodo = event => {
     if (event.target.className === 'editable') {
-      this.temporaryState = event.target.innerText
+      this.temporaryEditValue = event.target.innerText
     }
   }
 
   handleEditTodoComplete = event => {
-    if (this.temporaryState) {
+    if (this.temporaryEditValue) {
       const id = parseInt(event.target.parentElement.id)
 
-      this.model.editTodo(id, this.temporaryState)
-      this.temporaryState = ''
+      this.model.editTodo(id, this.temporaryEditValue)
+      this.temporaryEditValue = ''
     }
   }
 
