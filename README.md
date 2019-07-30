@@ -1,8 +1,15 @@
-# A Simple MVC Application in Vanilla JavaScript
+# Simple Todo MVC Application in Plain JavaScript
 
-`index.html`, `script.js`, and `style.css`. What else do you need?
+Learn MVC pattern by building a small app.
 
-- [View Application](https://taniarascia.github.io/mvc)
+- **Model** - Manages the data of an application
+- **View** - A visual representation of the model
+- **Controller** - Links the user and the system
+
+The app consists of `index.html`, `script.js`, and `style.css`. What else do you need?
+
+- [View Tutorial](https://www.taniarascia.com/javascript-mvc-todo-app)
+- [View Demo Application](https://taniarascia.github.io/mvc)
 
 ## Author
 

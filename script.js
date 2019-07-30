@@ -8,7 +8,7 @@ class Model {
     this.todos = JSON.parse(localStorage.getItem('todos')) || []
   }
 
-  bindHandler(controller) {
+  bindEvents(controller) {
     this.onTodoListChanged = controller.onTodoListChanged
   }
 
@@ -138,7 +138,7 @@ class View {
     console.log(todos)
   }
 
-  setUpEventListeners(controller) {
+  bindEvents(controller) {
     this.form.addEventListener('submit', controller.handleAddTodo)
     this.todoList.addEventListener('click', controller.handleDeleteTodo)
     this.todoList.addEventListener('input', controller.handleEditTodo)
@@ -153,12 +153,12 @@ class View {
  * Links the user and the system.
  */
 class Controller {
-  constructor() {
-    this.model = new Model()
-    this.view = new View()
+  constructor(model, view) {
+    this.model = model
+    this.view = view
 
-    this.model.bindHandler(this)
-    this.view.setUpEventListeners(this)
+    this.model.bindEvents(this)
+    this.view.bindEvents(this)
 
     this.temporaryEditValue
 
@@ -217,4 +217,4 @@ class Controller {
   }
 }
 
-const app = new Controller()
+const app = new Controller(new Model(), new View())
