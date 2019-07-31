@@ -12,10 +12,16 @@ class Model {
     this.onTodoListChanged = controller.onTodoListChanged
   }
 
-  addTodo(todo) {
-    this.todos = [...this.todos, todo]
-    this.update()
+  addTodo(todoText) {
+    const todo = {
+      id: this.todos.length > 0 ? this.todos[this.todos.length - 1].id + 1 : 1,
+      text: todoText,
+      complete: false,
+    }
 
+    this.todos.push(todo)
+
+    this.update()
     this.onTodoListChanged(this.todos)
   }
 
@@ -24,14 +30,13 @@ class Model {
       todo.id === id ? { id: todo.id, text: updatedText, complete: todo.complete } : todo
     )
     this.update()
-
     this.onTodoListChanged(this.todos)
   }
 
   deleteTodo(id) {
     this.todos = this.todos.filter(todo => todo.id !== id)
-    this.update()
 
+    this.update()
     this.onTodoListChanged(this.todos)
   }
 
@@ -39,8 +44,8 @@ class Model {
     this.todos = this.todos.map(todo =>
       todo.id === id ? { id: todo.id, text: todo.text, complete: !todo.complete } : todo
     )
-    this.update()
 
+    this.update()
     this.onTodoListChanged(this.todos)
   }
 
@@ -69,6 +74,8 @@ class View {
     this.title.textContent = 'Todos'
     this.todoList = this.createElement('ul', 'todo-list')
     this.app.append(this.title, this.form, this.todoList)
+
+    this.temporaryEditValue = ''
   }
 
   get todoText() {
@@ -139,18 +146,50 @@ class View {
   }
 
   bindEvents(controller) {
-    this.form.addEventListener('submit', controller.handleAddTodo)
-    this.todoList.addEventListener('click', controller.handleDeleteTodo)
-    this.todoList.addEventListener('input', controller.handleEditTodo)
-    this.todoList.addEventListener('focusout', controller.handleEditTodoComplete)
-    this.todoList.addEventListener('change', controller.handleToggle)
+    this.form.addEventListener('submit', event => {
+      event.preventDefault()
+
+      controller.handleAddTodo(this.todoText)
+      this.resetInput()
+    })
+
+    this.todoList.addEventListener('click', event => {
+      if (event.target.className === 'delete') {
+        const id = parseInt(event.target.parentElement.id)
+
+        controller.handleDeleteTodo(id)
+      }
+    })
+
+    this.todoList.addEventListener('input', event => {
+      if (event.target.className === 'editable') {
+        this.temporaryEditValue = event.target.innerText
+      }
+    })
+
+    this.todoList.addEventListener('focusout', event => {
+      if (this.temporaryEditValue) {
+        const id = parseInt(event.target.parentElement.id)
+
+        controller.handleEditTodoComplete(id, this.temporaryEditValue)
+        this.temporaryEditValue = ''
+      }
+    })
+
+    this.todoList.addEventListener('change', event => {
+      if (event.target.type === 'checkbox') {
+        const id = parseInt(event.target.parentElement.id)
+
+        controller.handleToggle(id)
+      }
+    })
   }
 }
 
 /**
  * @class Controller
  *
- * Links the user and the system.
+ * Links the user input and the output.
  */
 class Controller {
   constructor(model, view) {
@@ -160,8 +199,6 @@ class Controller {
     this.model.bindEvents(this)
     this.view.bindEvents(this)
 
-    this.temporaryEditValue
-
     // Display initial todos
     this.onTodoListChanged(this.model.todos)
   }
@@ -170,50 +207,20 @@ class Controller {
     this.view.displayTodos(todos)
   }
 
-  handleAddTodo = event => {
-    event.preventDefault()
-
-    if (this.view.todoText) {
-      const todo = {
-        id: this.model.todos.length + 1,
-        text: this.view.todoText,
-        complete: false,
-      }
-
-      this.model.addTodo(todo)
-      this.view.resetInput()
-    }
+  handleAddTodo = todoText => {
+    this.model.addTodo(todoText)
   }
 
-  handleEditTodo = event => {
-    if (event.target.className === 'editable') {
-      this.temporaryEditValue = event.target.innerText
-    }
+  handleEditTodoComplete = (id, todoText) => {
+    this.model.editTodo(id, todoText)
   }
 
-  handleEditTodoComplete = event => {
-    if (this.temporaryEditValue) {
-      const id = parseInt(event.target.parentElement.id)
-
-      this.model.editTodo(id, this.temporaryEditValue)
-      this.temporaryEditValue = ''
-    }
+  handleDeleteTodo = id => {
+    this.model.deleteTodo(id)
   }
 
-  handleDeleteTodo = event => {
-    if (event.target.className === 'delete') {
-      const id = parseInt(event.target.parentElement.id)
-
-      this.model.deleteTodo(id)
-    }
-  }
-
-  handleToggle = event => {
-    if (event.target.type === 'checkbox') {
-      const id = parseInt(event.target.parentElement.id)
-
-      this.model.toggleTodo(id)
-    }
+  handleToggle = id => {
+    this.model.toggleTodo(id)
   }
 }
 
