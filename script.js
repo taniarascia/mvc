@@ -8,7 +8,11 @@ class Model {
     this.todos = JSON.parse(localStorage.getItem('todos')) || []
   }
 
-  addTodo(todoText, callback) {
+  bindTodoListChanged(callback) {
+    this.onTodoListChanged = callback
+  }
+
+  addTodo(todoText) {
     const todo = {
       id: this.todos.length > 0 ? this.todos[this.todos.length - 1].id + 1 : 1,
       text: todoText,
@@ -18,32 +22,32 @@ class Model {
     this.todos.push(todo)
 
     this.updateStorage()
-    callback(this.todos)
+    this.onTodoListChanged(this.todos)
   }
 
-  editTodo(id, updatedText, callback) {
+  editTodo(id, updatedText) {
     this.todos = this.todos.map(todo =>
       todo.id === id ? { id: todo.id, text: updatedText, complete: todo.complete } : todo
     )
 
     this.updateStorage()
-    callback(this.todos)
+    this.onTodoListChanged(this.todos)
   }
 
-  deleteTodo(id, callback) {
+  deleteTodo(id) {
     this.todos = this.todos.filter(todo => todo.id !== id)
 
     this.updateStorage()
-    callback(this.todos)
+    this.onTodoListChanged(this.todos)
   }
 
-  toggleTodo(id, callback) {
+  toggleTodo(id) {
     this.todos = this.todos.map(todo =>
       todo.id === id ? { id: todo.id, text: todo.text, complete: !todo.complete } : todo
     )
 
     this.updateStorage()
-    callback(this.todos)
+    this.onTodoListChanged(this.todos)
   }
 
   updateStorage() {
@@ -140,6 +144,7 @@ class View {
       })
     }
 
+    // Debugging
     console.log(todos)
   }
 
@@ -202,10 +207,12 @@ class Controller {
     this.model = model
     this.view = view
 
-    this.view.bindAddTodo(this.handleAddTodo.bind(this))
-    this.view.bindEditTodo(this.handleEditTodo.bind(this))
-    this.view.bindDeleteTodo(this.handleDeleteTodo.bind(this))
-    this.view.bindToggleTodo(this.handleToggleTodo.bind(this))
+    // Explicit this binding
+    this.model.bindTodoListChanged(this.onTodoListChanged)
+    this.view.bindAddTodo(this.handleAddTodo)
+    this.view.bindEditTodo(this.handleEditTodo)
+    this.view.bindDeleteTodo(this.handleDeleteTodo)
+    this.view.bindToggleTodo(this.handleToggleTodo)
 
     // Display initial todos
     this.onTodoListChanged(this.model.todos)
@@ -216,27 +223,19 @@ class Controller {
   }
 
   handleAddTodo = todoText => {
-    this.model.addTodo(todoText, todo => {
-      this.onTodoListChanged(todo)
-    })
+    this.model.addTodo(todoText)
   }
 
   handleEditTodo = (id, todoText) => {
-    this.model.editTodo(id, todoText, todo => {
-      this.onTodoListChanged(todo)
-    })
+    this.model.editTodo(id, todoText)
   }
 
   handleDeleteTodo = id => {
-    this.model.deleteTodo(id, todo => {
-      this.onTodoListChanged(todo)
-    })
+    this.model.deleteTodo(id)
   }
 
   handleToggleTodo = id => {
-    this.model.toggleTodo(id, todo => {
-      this.onTodoListChanged(todo)
-    })
+    this.model.toggleTodo(id)
   }
 }
 
