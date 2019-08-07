@@ -21,8 +21,7 @@ class Model {
 
     this.todos.push(todo)
 
-    this.updateStorage()
-    this.onTodoListChanged(this.todos)
+    this.update(this.todos)
   }
 
   editTodo(id, updatedText) {
@@ -30,15 +29,13 @@ class Model {
       todo.id === id ? { id: todo.id, text: updatedText, complete: todo.complete } : todo
     )
 
-    this.updateStorage()
-    this.onTodoListChanged(this.todos)
+    this.update(this.todos)
   }
 
   deleteTodo(id) {
     this.todos = this.todos.filter(todo => todo.id !== id)
 
-    this.updateStorage()
-    this.onTodoListChanged(this.todos)
+    this.update(this.todos)
   }
 
   toggleTodo(id) {
@@ -46,12 +43,12 @@ class Model {
       todo.id === id ? { id: todo.id, text: todo.text, complete: !todo.complete } : todo
     )
 
-    this.updateStorage()
-    this.onTodoListChanged(this.todos)
+    this.update(this.todos)
   }
 
-  updateStorage() {
-    localStorage.setItem('todos', JSON.stringify(this.todos))
+  update(todos) {
+    this.onTodoListChanged(todos)
+    localStorage.setItem('todos', JSON.stringify(todos))
   }
 }
 
