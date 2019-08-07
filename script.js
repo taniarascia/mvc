@@ -8,11 +8,7 @@ class Model {
     this.todos = JSON.parse(localStorage.getItem('todos')) || []
   }
 
-  bindEvents(controller) {
-    this.onTodoListChanged = controller.onTodoListChanged
-  }
-
-  addTodo(todoText) {
+  addTodo(todoText, callback) {
     const todo = {
       id: this.todos.length > 0 ? this.todos[this.todos.length - 1].id + 1 : 1,
       text: todoText,
@@ -21,35 +17,36 @@ class Model {
 
     this.todos.push(todo)
 
-    this.update()
-    this.onTodoListChanged(this.todos)
+    this.updateStorage()
+    callback(this.todos)
   }
 
-  editTodo(id, updatedText) {
+  editTodo(id, updatedText, callback) {
     this.todos = this.todos.map(todo =>
       todo.id === id ? { id: todo.id, text: updatedText, complete: todo.complete } : todo
     )
-    this.update()
-    this.onTodoListChanged(this.todos)
+
+    this.updateStorage()
+    callback(this.todos)
   }
 
-  deleteTodo(id) {
+  deleteTodo(id, callback) {
     this.todos = this.todos.filter(todo => todo.id !== id)
 
-    this.update()
-    this.onTodoListChanged(this.todos)
+    this.updateStorage()
+    callback(this.todos)
   }
 
-  toggleTodo(id) {
+  toggleTodo(id, callback) {
     this.todos = this.todos.map(todo =>
       todo.id === id ? { id: todo.id, text: todo.text, complete: !todo.complete } : todo
     )
 
-    this.update()
-    this.onTodoListChanged(this.todos)
+    this.updateStorage()
+    callback(this.todos)
   }
 
-  update() {
+  updateStorage() {
     localStorage.setItem('todos', JSON.stringify(this.todos))
   }
 }
@@ -76,6 +73,7 @@ class View {
     this.app.append(this.title, this.form, this.todoList)
 
     this.temporaryEditValue = ''
+    this.initLocalListeners()
   }
 
   get todoText() {
@@ -145,42 +143,50 @@ class View {
     console.log(todos)
   }
 
-  bindEvents(controller) {
-    this.form.addEventListener('submit', event => {
-      event.preventDefault()
-
-      controller.handleAddTodo(this.todoText)
-      this.resetInput()
-    })
-
-    this.todoList.addEventListener('click', event => {
-      if (event.target.className === 'delete') {
-        const id = parseInt(event.target.parentElement.id)
-
-        controller.handleDeleteTodo(id)
-      }
-    })
-
+  initLocalListeners() {
     this.todoList.addEventListener('input', event => {
       if (event.target.className === 'editable') {
         this.temporaryEditValue = event.target.innerText
       }
     })
+  }
 
+  bindAddTodo(handler) {
+    this.form.addEventListener('submit', event => {
+      event.preventDefault()
+
+      handler(this.todoText)
+      this.resetInput()
+    })
+  }
+
+  bindDeleteTodo(handler) {
+    this.todoList.addEventListener('click', event => {
+      if (event.target.className === 'delete') {
+        const id = parseInt(event.target.parentElement.id)
+
+        handler(id)
+      }
+    })
+  }
+
+  bindEditTodo(handler) {
     this.todoList.addEventListener('focusout', event => {
       if (this.temporaryEditValue) {
         const id = parseInt(event.target.parentElement.id)
 
-        controller.handleEditTodoComplete(id, this.temporaryEditValue)
+        handler(id, this.temporaryEditValue)
         this.temporaryEditValue = ''
       }
     })
+  }
 
+  bindToggleTodo(handler) {
     this.todoList.addEventListener('change', event => {
       if (event.target.type === 'checkbox') {
         const id = parseInt(event.target.parentElement.id)
 
-        controller.handleToggle(id)
+        handler(id)
       }
     })
   }
@@ -196,8 +202,10 @@ class Controller {
     this.model = model
     this.view = view
 
-    this.model.bindEvents(this)
-    this.view.bindEvents(this)
+    this.view.bindAddTodo(this.handleAddTodo.bind(this))
+    this.view.bindEditTodo(this.handleEditTodo.bind(this))
+    this.view.bindDeleteTodo(this.handleDeleteTodo.bind(this))
+    this.view.bindToggleTodo(this.handleToggleTodo.bind(this))
 
     // Display initial todos
     this.onTodoListChanged(this.model.todos)
@@ -208,19 +216,27 @@ class Controller {
   }
 
   handleAddTodo = todoText => {
-    this.model.addTodo(todoText)
+    this.model.addTodo(todoText, todo => {
+      this.onTodoListChanged(todo)
+    })
   }
 
-  handleEditTodoComplete = (id, todoText) => {
-    this.model.editTodo(id, todoText)
+  handleEditTodo = (id, todoText) => {
+    this.model.editTodo(id, todoText, todo => {
+      this.onTodoListChanged(todo)
+    })
   }
 
   handleDeleteTodo = id => {
-    this.model.deleteTodo(id)
+    this.model.deleteTodo(id, todo => {
+      this.onTodoListChanged(todo)
+    })
   }
 
-  handleToggle = id => {
-    this.model.toggleTodo(id)
+  handleToggleTodo = id => {
+    this.model.toggleTodo(id, todo => {
+      this.onTodoListChanged(todo)
+    })
   }
 }
 
