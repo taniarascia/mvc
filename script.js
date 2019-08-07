@@ -12,6 +12,11 @@ class Model {
     this.onTodoListChanged = callback
   }
 
+  _commit(todos) {
+    this.onTodoListChanged(todos)
+    localStorage.setItem('todos', JSON.stringify(todos))
+  }
+
   addTodo(todoText) {
     const todo = {
       id: this.todos.length > 0 ? this.todos[this.todos.length - 1].id + 1 : 1,
@@ -21,7 +26,7 @@ class Model {
 
     this.todos.push(todo)
 
-    this.update(this.todos)
+    this._commit(this.todos)
   }
 
   editTodo(id, updatedText) {
@@ -29,13 +34,13 @@ class Model {
       todo.id === id ? { id: todo.id, text: updatedText, complete: todo.complete } : todo
     )
 
-    this.update(this.todos)
+    this._commit(this.todos)
   }
 
   deleteTodo(id) {
     this.todos = this.todos.filter(todo => todo.id !== id)
 
-    this.update(this.todos)
+    this._commit(this.todos)
   }
 
   toggleTodo(id) {
@@ -43,12 +48,7 @@ class Model {
       todo.id === id ? { id: todo.id, text: todo.text, complete: !todo.complete } : todo
     )
 
-    this.update(this.todos)
-  }
-
-  update(todos) {
-    this.onTodoListChanged(todos)
-    localStorage.setItem('todos', JSON.stringify(todos))
+    this._commit(this.todos)
   }
 }
 
@@ -73,15 +73,15 @@ class View {
     this.todoList = this.createElement('ul', 'todo-list')
     this.app.append(this.title, this.form, this.todoList)
 
-    this.temporaryEditValue = ''
-    this.initLocalListeners()
+    this._temporaryTodoText = ''
+    this._initLocalListeners()
   }
 
-  get todoText() {
+  get _todoText() {
     return this.input.value
   }
 
-  resetInput() {
+  _resetInput() {
     this.input.value = ''
   }
 
@@ -145,10 +145,10 @@ class View {
     console.log(todos)
   }
 
-  initLocalListeners() {
+  _initLocalListeners() {
     this.todoList.addEventListener('input', event => {
       if (event.target.className === 'editable') {
-        this.temporaryEditValue = event.target.innerText
+        this._temporaryTodoText = event.target.innerText
       }
     })
   }
@@ -157,8 +157,10 @@ class View {
     this.form.addEventListener('submit', event => {
       event.preventDefault()
 
-      handler(this.todoText)
-      this.resetInput()
+      if (this._todoText) {
+        handler(this._todoText)
+        this._resetInput()
+      }
     })
   }
 
@@ -174,11 +176,11 @@ class View {
 
   bindEditTodo(handler) {
     this.todoList.addEventListener('focusout', event => {
-      if (this.temporaryEditValue) {
+      if (this._temporaryTodoText) {
         const id = parseInt(event.target.parentElement.id)
 
-        handler(id, this.temporaryEditValue)
-        this.temporaryEditValue = ''
+        handler(id, this._temporaryTodoText)
+        this._temporaryTodoText = ''
       }
     })
   }
@@ -197,7 +199,10 @@ class View {
 /**
  * @class Controller
  *
- * Links the user input and the output.
+ * Links the user input and the view output.
+ *
+ * @param model
+ * @param view
  */
 class Controller {
   constructor(model, view) {
