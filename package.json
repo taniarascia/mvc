@@ -1,0 +1,33 @@
+{
+  "name": "MVC",
+  "version": "1.0.0",
+  "description": "Simple MVC App in Plain JavaScript",
+  "main": "index.js",
+  "repository": "https://github.com/taniarascia/mvc.git",
+  "author": "Tania Rascia",
+  "license": "MIT",
+  "scripts": {
+    "audit": "source-map-explorer public/dist/main.bundle.js",
+    "clear": "rm -rf public/dist/",
+    "clear:all": "rm -rf node_modules/ && npm run clear",
+    "count": "find src -name '*.js' | xargs wc -l | sort -r",
+    "build": "npm run build:development",
+    "build:development": "webpack --config webpack/config.dev.js",
+    "build:production": "webpack --config webpack/config.prod.js",
+    "watch": "npm run build:development -- -w",
+    "start": "node public/dist/main.bundle.js"
+  },
+  "dependencies": {
+    "@babel/core": "^7.7.4",
+    "@babel/plugin-proposal-class-properties": "^7.7.4",
+    "@babel/preset-env": "^7.7.4",
+    "babel-loader": "^8.0.6",
+    "source-map-explorer": "^2.1.1",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10"
+  },
+  "babel": {
+    "presets": [ "@babel/preset-env" ],
+    "plugins": [ "@babel/plugin-proposal-class-properties" ]
+  }
+}
