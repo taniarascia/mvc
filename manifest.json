@@ -1,0 +1,16 @@
+{
+  "name": "MVC Todo List",
+  "short_name": "Todos",
+  "description": "MVC application in plain JavaScript",
+  "start_url": "/mvc/index.html",
+  "display": "standalone",
+  "background_color": "cyan",
+  "theme_color": "cyan",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

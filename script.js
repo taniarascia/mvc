@@ -1,3 +1,18 @@
+"use strict";
+
+function writeToCloud(todo, mark) {
+    console.log("writeToCloud")
+    if (!localStorage.userName || !navigator.onLine) return false
+    let s = todo.id+'_'+todo.text
+    submitData(localStorage.userName, s, mark)
+    console.log("sumbitted: "+s+' '+mark)
+    return true
+}
+
+function findID(id) {
+    return M.todos.find(x => x.id == id)
+}
+
 /**
  * @class Model
  *
@@ -12,43 +27,45 @@ class Model {
     this.onTodoListChanged = callback
   }
 
-  _commit(todos) {
-    this.onTodoListChanged(todos)
-    localStorage.setItem('todos', JSON.stringify(todos))
+  _commit() {
+    this.onTodoListChanged(this.todos)
+    localStorage.setItem('todos', JSON.stringify(this.todos))
   }
 
-  addTodo(todoText) {
-    const todo = {
-      id: this.todos.length > 0 ? this.todos[this.todos.length - 1].id + 1 : 1,
-      text: todoText,
-      complete: false,
-    }
+  addTodo(text) {
+    let n = this.todos.length
+    let id =  n ? this.todos[n-1].id + 1 : 1
+    let complete = false
+    const todo = { id, text, complete }
 
     this.todos.push(todo)
-
-    this._commit(this.todos)
+    writeToCloud(todo, '')
+    this._commit()
   }
 
   editTodo(id, updatedText) {
-    this.todos = this.todos.map(todo =>
-      todo.id === id ? { id: todo.id, text: updatedText, complete: todo.complete } : todo
-    )
+    let todo = this.todos.find(x => x.id == id)
+    if (!todo) return
 
-    this._commit(this.todos)
+    writeToCloud(todo, 'D')
+    todo.text = updatedText
+    writeToCloud(todo, '')
+    this._commit()
   }
 
   deleteTodo(id) {
-    this.todos = this.todos.filter(todo => todo.id !== id)
-
-    this._commit(this.todos)
+    this.todos = this.todos.filter(x => x.id !== id)
+    writeToCloud(todo, 'D')
+    this._commit()
   }
 
   toggleTodo(id) {
-    this.todos = this.todos.map(todo =>
-      todo.id === id ? { id: todo.id, text: todo.text, complete: !todo.complete } : todo
-    )
+    let todo = this.todos.find(x => x.id == id)
+    if (!todo) return
 
-    this._commit(this.todos)
+    todo.complete = !todo.complete
+    writeToCloud(todo, todo.complete? 'C' : '')
+    this._commit()
   }
 }
 
@@ -205,40 +222,39 @@ class View {
  * @param view
  */
 class Controller {
-  constructor(model, view) {
-    this.model = model
-    this.view = view
+  constructor() {
+    //M = model,  V = view -- global
 
     // Explicit this binding
-    this.model.bindTodoListChanged(this.onTodoListChanged)
-    this.view.bindAddTodo(this.handleAddTodo)
-    this.view.bindEditTodo(this.handleEditTodo)
-    this.view.bindDeleteTodo(this.handleDeleteTodo)
-    this.view.bindToggleTodo(this.handleToggleTodo)
+    M.bindTodoListChanged(this.onTodoListChanged)
+    V.bindAddTodo(this.handleAddTodo)
+    V.bindEditTodo(this.handleEditTodo)
+    V.bindDeleteTodo(this.handleDeleteTodo)
+    V.bindToggleTodo(this.handleToggleTodo)
 
     // Display initial todos
-    this.onTodoListChanged(this.model.todos)
+    this.onTodoListChanged(M.todos)
   }
 
-  onTodoListChanged = todos => {
-    this.view.displayTodos(todos)
+  onTodoListChanged(todos) {
+    V.displayTodos(todos)
   }
 
-  handleAddTodo = todoText => {
-    this.model.addTodo(todoText)
+  handleAddTodo(todoText) {
+    M.addTodo(todoText)
   }
 
-  handleEditTodo = (id, todoText) => {
-    this.model.editTodo(id, todoText)
+  handleEditTodo(id, todoText) {
+    M.editTodo(id, todoText)
   }
 
-  handleDeleteTodo = id => {
-    this.model.deleteTodo(id)
+  handleDeleteTodo(id) {
+    M.deleteTodo(id)
   }
 
-  handleToggleTodo = id => {
-    this.model.toggleTodo(id)
+  handleToggleTodo(id) {
+    M.toggleTodo(id)
   }
 }
 
-const app = new Controller(new Model(), new View())
+const M = new Model(), V = new View(), app = new Controller(M, V)
