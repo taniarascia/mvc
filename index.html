@@ -9,18 +9,73 @@
   <meta name="author" content="Tania Rascia, 2019" />
   <meta name="description" content="MVC application" />
 
-  <title>Todo App</title>
+  <title>MVC Todo App</title>
 
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" sizes="192x192" href="favicon.ico">
+  <link rel="icon" sizes="192x192" href="favicon.png">
   <!-- <link rel="manifest" href="manifest.json"> -->
+
+  <style>
+    input {
+      margin: 4px;
+    }
+    .topRight {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+    #dialog {
+      position: relative;
+      width: 340px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 12px;
+    }
+    #dialog, #localUser {
+      font-size: smaller;
+      border: 1px solid blue;
+    }
+    #localUser {
+      font-size: smaller;
+      padding: 12px;
+      cursor: pointer;
+    }
+    #accept {
+      background: "yellow";
+    }
+  </style>
 </head>
 
 <body>
-  <div id="root"></div>
+    <h1>Todos</h1>
+    <span id=localUser class=topRight onclick="V.showDialog()"></span>
+    <form id=form>
+      <input id=input type="text" placeholder="Add todo">
+      <button id=button>Submit</button>
+    </form>
+  
+  <div id=dialog hidden>
+    User name (or e-mail)
+    <input id=user type="text" placeholder="Identifier"
+    oninput="if (!value) {console.log('empty')}"><BR>
+    Should be long enough to identify you <BR>
+    <p id=accept>
+    <input type="checkbox" onchange="OK.disabled = !(checked && user.value)">
+    My data will be stored in a public Sheet.<BR>
+    Anyone with the proper key can access the data.<BR>
+    </p>
+    <input type=button id=OK value=OK disabled onclick="V.setUser(user.value)">
+    Use public database <BR>
+    <input type=button id=NO value=NO onclick="V.setUser()">
+    Remain local & private
+    <input type=button id=closer value=x class=topRight onclick="V.setUser(false)">
+  </div>
 
-  <script src="script.js"></script>
+  <ul id=list class="todoList">
+  </ul>
+
   <script src="submitForm.js"></script>
+  <script src="script.js"></script>
 </body>
 
 </html>
