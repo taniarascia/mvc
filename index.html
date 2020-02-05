@@ -19,6 +19,9 @@
     input {
       margin: 4px;
     }
+    button, #localUser {
+      cursor: pointer;
+    }
     .topRight {
       position: absolute;
       top: 0;
@@ -35,20 +38,18 @@
       font-size: smaller;
       border: 1px solid blue;
     }
-    #localUser {
-      font-size: smaller;
-      padding: 12px;
-      cursor: pointer;
-    }
-    #accept {
-      background: "yellow";
+    #version, #localUser {
+      padding: 8px;
     }
   </style>
 </head>
 
 <body>
     <h1>Todos</h1>
-    <span id=localUser class=topRight onclick="V.showDialog()"></span>
+    <div id=version class=topRight>
+      <b>V1.1</b>&emsp;
+      <span id=localUser onclick="V.showDialog()"></span>
+    </div>
     <form id=form>
       <input id=input type="text" placeholder="Add todo">
       <button id=button>Submit</button>

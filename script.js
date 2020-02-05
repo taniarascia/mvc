@@ -2,11 +2,27 @@
 
 function readFromCloud(unused, data) {
     let un = localStorage.userName
-    for (let t of data.reverse().filter(t => t.user == un)) {
-      let [id, txt] = t.topic.split('_')
-      if (!findID(id)) 
-        M.todos.push(M.newTodo(txt, t.complete == 'C'))
+    let map = new Map()
+    for (let t of data) if (t.user == un) {
+        let [id, txt] = t.topic.split('_')
+        id = Number(id)
+        map.set(id, [txt, t.marks])
     }
+    console.log(map)
+    for (let id of map.keys()) {
+        let todo = findID(id)
+        let [txt, mrk] = map.get(id)
+        if (mrk.startsWith('D')) {
+            M.removeItem(id)
+        } else if (todo) { //found in todos
+            todo.text = txt
+            todo.complete = mrk.startsWith('C')
+        } else { //new item with given id
+            todo = M.newItem(txt, mrk.startsWith('C'), id)
+            M.todos.push(todo)
+        }
+    }
+    M.todos.sort((a, b) => a.id - b.id)
     V.displayTodos(M.todos)
 }
 
@@ -14,7 +30,6 @@ function writeToCloud(todo, mark) {
     let s = todo.id+'_'+todo.text
     submitData(localStorage.userName, s, mark)
     console.log('sumbitted: '+s+' '+mark)
-    return true
 }
 
 function findID(id) {
@@ -44,36 +59,40 @@ class Model {
         writeToCloud(todo, mark)
   }
 
-  newTodo(text, complete) {
+  newItem(text, complete, id) { //id is optional
     let n = this.todos.length
-    let id =  n ? this.todos[n-1].id + 1 : 1
+    if (!id)
+      id =  n ? this.todos[n-1].id + 1 : 1
     return { id, text, complete }
   }
   addTodo(text) {
-    this.todos.push(newTodo(text, false))
+    let todo = this.newItem(text, false)
+    this.todos.push(todo)
     this._commit(todo, '')
   }
 
   editTodo(id, updatedText) {
     let todo = findID(id)
     if (!todo) return
-
     todo.text = updatedText
     this._commit(todo, '')
   }
 
+  removeItem(id) {
+    let k = this.todos.findIndex(x => x.id == id)
+    if (k < 0) return null
+    let [todo] = this.todos.splice(k, 1)
+    return todo
+  }
   deleteTodo(id) {
-    let todo = findID(id)
+    let todo = this.removeItem(id)
     if (!todo) return
-
-    this.todos = this.todos.filter(x => x.id != id)
     this._commit(todo, 'D')
   }
 
   toggleTodo(id) {
     let todo = findID(id)
     if (!todo) return
-
     todo.complete = !todo.complete
     this._commit(todo, todo.complete? 'C' : '')
   }
