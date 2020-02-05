@@ -43,7 +43,8 @@ function findID(id) {
  */
 class Model {
   constructor() {
-    this.todos = JSON.parse(localStorage.todos) || []
+    let td = localStorage.todos
+    this.todos = td? JSON.parse(td) : []
     if (localStorage.userName && navigator.onLine)
         tabularData(readFromCloud)
   }
