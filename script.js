@@ -5,8 +5,7 @@ function readFromCloud(unused, data) {
     let map = new Map()
     for (let t of data) if (t.user == un) {
         let [id, txt] = t.topic.split('_')
-        id = Number(id)
-        map.set(id, [txt, t.marks])
+        map.set(Number(id), [txt, t.marks])
     }
     console.log(map)
     for (let id of map.keys()) {
