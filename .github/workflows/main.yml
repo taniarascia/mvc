@@ -24,7 +24,7 @@ jobs:
     - name: port-github-action
       uses: port-labs/port-github-action@v1.5.0      
       with: 
-        client-id: ${{ secrets.PORT_CLIENT_ID }}
+        clientId: ${{ secrets.PORT_CLIENT_ID }}
         client-secret: ${{ secrets.PORT_CLIENT_SECRET }}
         entity-identifier: ${{ github.event.repository.full_name }}
         properties: |
