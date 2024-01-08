@@ -1,0 +1,34 @@
+name: Update PR count in Port
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Runs every hour
+
+jobs:
+
+  update_pr_count:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Get PR count
+      id: prs
+      uses: octokit/request-action@v2.0.0
+      with:
+        route: GET /repos/:owner/:repo/pulls
+        owner: ${{ github.repository_owner }}
+        repo: ${{ github.event.repository.name }}
+    
+    - name: Update Port
+      uses: getport/github-action@v1.3.2
+      with: 
+        client-id: ${{ secrets.PORT_CLIENT_ID }}
+        client-secret: ${{ secrets.PORT_CLIENT_SECRET }}
+        entity-identifier: ${{ github.event.repository.full_name }}
+        properties: |
+          {
+            "openPullRequests": ${{ steps.prs.outputs.data.length }}  
+          }
