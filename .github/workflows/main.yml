@@ -34,3 +34,8 @@ jobs:
           {
             "open_prs": ${{ steps.prs.outputs.data.length }}  
           }
+        team: '["Port"]'
+        relations: |
+          {
+            "deployedAt": "prod"
+          }
