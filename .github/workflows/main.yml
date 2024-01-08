@@ -25,9 +25,12 @@ jobs:
       uses: port-labs/port-github-action@v1.5.0      
       with: 
         clientId: ${{ secrets.PORT_CLIENT_ID }}
-        client-secret: ${{ secrets.PORT_CLIENT_SECRET }}
-        entity-identifier: ${{ github.event.repository.full_name }}
+        clientSecret: ${{ secrets.PORT_CLIENT_SECRET }}
+        operation: UPSERT
+        identifier: port-github-action
+        title: Port Github Action
+        blueprint: PortIntegration
         properties: |
           {
-            "openPullRequests": ${{ steps.prs.outputs.data.length }}  
+            "open_prs": ${{ steps.prs.outputs.data.length }}  
           }
