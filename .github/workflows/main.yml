@@ -18,6 +18,8 @@ jobs:
       uses: octokit/request-action@v2.0.0
       with:
         route: GET /repos/${{ github.repository_owner }}/${{ github.event.repository.name }}/pulls
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
     - name: port-github-action
       uses: port-labs/port-github-action@v1.5.0      
