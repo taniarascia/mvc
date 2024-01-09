@@ -23,8 +23,8 @@ jobs:
 
     - name: Set PR count env var
       run: |
-        echo "PR_COUNT=${{ steps.prs.outputs.data }}" >> $GITHUB_OUTPUT
-        echo "Number of pull requests: ${{ steps.prs.outputs.data.head.repo.open_issues_count }}"
+        PRCOUNT=$(echo '${{ steps.previous_step.outputs.data }}' | jq '.[0].head.repo')
+        echo "Number of pull requests: PRCOUNT.open_issues_count"
         echo "Number of pull requests: ${{ steps.prs.outputs.data.head }}"
         echo "Number of pull requests: ${{ steps.prs.outputs.data.head.repo }}"
     
