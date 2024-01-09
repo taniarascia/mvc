@@ -22,7 +22,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Set PR count env var
-      run: echo "PR_COUNT<<${{ steps.prs.outputs.pr_count }}" >> $GITHUB_ENV
+      run: echo "PR_COUNT=${{ steps.prs.outputs.pr_count }}" >> $GITHUB_ENV
     
     - name: port-github-action
       uses: port-labs/port-github-action@v1.5.0      
