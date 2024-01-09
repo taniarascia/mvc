@@ -31,6 +31,4 @@ jobs:
         title: Port Github Action
         blueprint: service
         properties: |
-          {
-            "open_prs": "${{ steps.prs.outputs.data.length }}" 
-          }
+          $(toJSON "{\"open_prs\": \"${{ steps.prs.outputs.data.length }}\"}")
