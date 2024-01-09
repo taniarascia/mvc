@@ -25,8 +25,10 @@ jobs:
       run: |
         PRCOUNT=$(echo '${{ toJSON(steps.prs.outputs.data) }}' | jq '.[0].head.repo') >> $GITHUB_ENV
         echo "Number of pull requests: PRCOUNT.open_issues_count"
-        echo "${{ toJSON(steps.prs.outputs.data) }}" | jq -r '.[0].head.repo'
+        echo "${{ steps.prs.outputs.data }}" | jq -r '.[0].head.repo' > repo_info.txt
         echo "Number of pull requests: ${{ steps.prs.outputs.data.head.repo }}"
+        echo "PRCOUNT=$(<repo_info.txt)" >> $GITHUB_ENV
+        echo PRCOUNT
     
     - name: port-github-action
       uses: port-labs/port-github-action@v1.5.0      
