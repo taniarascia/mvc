@@ -23,7 +23,8 @@ jobs:
 
     - name: Set PR count env var
       run: |
-        echo "PR_COUNT=${{ steps.prs.outputs.pr_count }}" >> $GITHUB_ENV
+        echo "PR_COUNT=${{ steps.prs.outputs.pr_count }}" >> $GITHUB_OUTPUT
+        echo "Number of pull requests: ${{ steps.prs.outputs.data }}"
         echo "Number of pull requests: $PR_COUNT"
         echo "Number of pull requests: ${{ steps.prs.outputs.pr_count }}"
     
