@@ -21,15 +21,13 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Set PR count env var
+    - name: Save PRs to file
+      run: echo '${{ steps.prs.outputs.data }}' > prs.json
+
+    - name: Count PRs using Python
       run: |
-        PRCOUNT=$(echo '${{ steps.prs.outputs.data }}' | jq '.[0].head.repo') >> $GITHUB_ENV
-        echo 'OOOOOOOOO ${{ steps.prs.outputs.data }}' | jq '.[0].head.repo'
-        echo "Number of pull requests: PRCOUNT.open_issues_count"
-        echo "${{ steps.prs.outputs.data }}" | jq -r '.[0].head.repo' > repo_info.txt
-        echo "Number of pull requests: ${{ steps.prs.outputs.data.head.repo }}"
-        echo "PRCOUNT=$(<repo_info.txt)" >> $GITHUB_ENV
-        echo PRCOUNT
+        ppython -c "import json; pr_count = len(json.load(open('prs.json'))); print(f'Total pull requests: {pr_count}');" > pr_count.txt
+          cat pr_count.txt
     
     - name: port-github-action
       uses: port-labs/port-github-action@v1.5.0      
