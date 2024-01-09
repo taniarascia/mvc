@@ -32,10 +32,5 @@ jobs:
         blueprint: PortIntegration
         properties: |
           {
-            "open_prs": ${{ steps.prs.outputs.data.length }}  
-          }
-        team: '["Port"]'
-        relations: |
-          {
-            "deployedAt": "prod"
+            "open_prs": "${{ steps.prs.outputs.data.length }}" 
           }
