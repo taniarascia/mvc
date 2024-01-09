@@ -20,6 +20,9 @@ jobs:
         route: GET /repos/${{ github.repository_owner }}/${{ github.event.repository.name }}/pulls
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set PR count env var
+      run: echo "PR_COUNT<<${{ steps.prs.outputs.pr_count }}" >> $GITHUB_ENV
     
     - name: port-github-action
       uses: port-labs/port-github-action@v1.5.0      
@@ -31,4 +34,6 @@ jobs:
         title: Port Github Action
         blueprint: service
         properties: |
-          $(toJSON "{\"open_prs\": \"${{ steps.prs.outputs.data.length }}\"}")
+          {
+            "open_prs": "$PR_COUNT"  
+          }
