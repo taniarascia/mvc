@@ -35,5 +35,5 @@ jobs:
         blueprint: service
         properties: |
           {
-            "open_prs": "$PR_COUNT"  
+            '"open_prs": "${{ steps.prs.outputs.pr_count }}"' 
           }
