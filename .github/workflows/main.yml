@@ -26,8 +26,13 @@ jobs:
 
     - name: Count PRs using Python
       run: |
-        ppython -c "import json; pr_count = len(json.load(open('prs.json'))); print(f'Total pull requests: {pr_count}');" > pr_count.txt
+        python -c "import json; pr_count = len(json.load(open('prs.json'))); print(f'Total pull requests: {pr_count}');" > pr_count.txt
           cat pr_count.txt
+
+    - name: Set PR count as env variable
+      run: |
+        echo "PR_COUNT=$(<pr_count.txt)" >> $GITHUB_ENV
+        echo PRCOUNT
     
     - name: port-github-action
       uses: port-labs/port-github-action@v1.5.0      
