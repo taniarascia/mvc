@@ -17,7 +17,6 @@ This application consists of `index.html`, `script.js`, and `style.css`. This me
 
 ## Author
 
-- [Tania Rascia](https://www.taniarascia.com)
 - [Debugchess](chestr@hey.com)
 
 ## License
